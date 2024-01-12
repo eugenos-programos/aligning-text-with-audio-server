@@ -2,13 +2,15 @@ from flask import Flask, request, send_file
 from aeneas.executetask import ExecuteTask
 from aeneas.task import Task
 import json
+import os
+import torch
+
 
 
 app = Flask(__name__)
 
 
 def normalize_text(text: str) -> str:
-    import torch
 
     model, example_texts, languages, punct, apply_te = torch.hub.load(repo_or_dir='snakers4/silero-models',
                                                                   model='silero_te')
@@ -42,7 +44,9 @@ def capitalize_and_save_text_bysentences(text: str, file_name: str):
         if sentence:
             capitalized_sentence = sentence[0].upper() + sentence[1:]
             result_text += capitalized_sentence + '\n'
-
+    if os.path.exists(file_name):
+        os.system(f"rm {file_name}")
+    os.system(f"touch {file_name}")
     with open(file_name, 'w') as sent_file:
         sent_file.write(result_text)
 
