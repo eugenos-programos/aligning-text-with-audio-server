@@ -3,8 +3,8 @@ from aeneas.executetask import ExecuteTask
 from aeneas.task import Task
 import json
 import os
+import whisper_timestamped as whisper
 import torch
-
 
 
 app = Flask(__name__)
@@ -50,17 +50,31 @@ def capitalize_and_save_text_bysentences(text: str, file_name: str):
     with open(file_name, 'w') as sent_file:
         sent_file.write(result_text)
 
-@app.route('/align', methods=['POST'])
+def extract_timelines_to_file(audio_file_name, file_name):
+    audio = whisper.load_audio(audio_file_name)
+    model = whisper.load_model("tiny", device='cpu')
+    result = whisper.transcribe(model, audio, language='en')
+    with open(file_name, 'w') as file:
+        json.dump(result, file, indent=2, ensure_ascii=False)
+
+@app.route('/align_with_text', methods=['POST'])
 def align_endpoint():
-        audio_file_name = "audio.mp3"
-        text_file_name = "subtitles.txt"
-        audio_file = request.files['audio_file'].save(audio_file_name)
-        text_file = request.files['text_file'].read().decode("utf-8")
-        text = convert_json_to_text(json.loads(str(text_file)))
-        normalized_text = normalize_text(text)
-        capitalize_and_save_text_bysentences(normalized_text, text_file_name)
-        align_text_with_audio(text_file_name, audio_file_name)
-        return send_file("syncmap.json")
+    audio_file_name = "audio.mp3"
+    text_file_name = "subtitles.txt"
+    request.files['audio_file'].save(audio_file_name)
+    text_file = request.files['text_file'].read().decode("utf-8")
+    text = convert_json_to_text(json.loads(str(text_file)))
+    normalized_text = normalize_text(text)
+    capitalize_and_save_text_bysentences(normalized_text, text_file_name)
+    align_text_with_audio(text_file_name, audio_file_name)
+    return send_file("syncmap.json")
+
+@app.route('/align_without_text', methods=['POST'])
+def align_without_text_endpoint():
+    audio_file_name = "audio.mp3"
+    request.files['audio_file'].save(audio_file_name)
+    extract_timelines_to_file(audio_file_name, "timelines.json")
+    return send_file("timelines.json")
 
 
 if __name__ == '__main__':
