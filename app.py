@@ -5,6 +5,7 @@ import json
 import os
 import whisper_timestamped as whisper
 import torch
+import urllib
 
 
 app = Flask(__name__)
@@ -72,7 +73,9 @@ def align_endpoint():
 @app.route('/align_without_text', methods=['POST'])
 def align_without_text_endpoint():
     audio_file_name = "audio.mp3"
-    request.files['audio_file'].save(audio_file_name)
+    audio_u = request.files.get('audio_url')
+    audio_url = audio_u.read().decode('utf-8')
+    urllib.request.urlretrieve(audio_url, audio_file_name)
     extract_timelines_to_file(audio_file_name, "timelines.json")
     return send_file("timelines.json")
 

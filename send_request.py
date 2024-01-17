@@ -1,6 +1,5 @@
 import requests
 
 
-print(requests.post("http://localhost:5000/align_without_text", files={'audio_file': open("example.mp3", 'rb'), 'text_file': open("subtitle.json", 'r', encoding='utf-8')}).text)
-
+requests.post("http://127.0.0.1:5000/align_without_text", files={'audio_url': 'https://elang-spece-mirror.nyc3.cdn.digitaloceanspaces.com/listening/v0/news/2BLfYEB9U1M/audio'})
 
