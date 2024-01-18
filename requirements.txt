@@ -1,5 +1,4 @@
 flask==3.0.0
-aeneas==1.7.3.0
 requests==2.31.0
 torch==2.1.2
 PyYAML==6.0.1

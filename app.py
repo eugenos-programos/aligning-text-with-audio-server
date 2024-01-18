@@ -1,6 +1,4 @@
 from flask import Flask, request, send_file
-from aeneas.executetask import ExecuteTask
-from aeneas.task import Task
 import json
 import os
 import whisper_timestamped as whisper
@@ -73,12 +71,12 @@ def align_endpoint():
 @app.route('/align_without_text', methods=['POST'])
 def align_without_text_endpoint():
     audio_file_name = "audio.mp3"
-    audio_u = request.files.get('audio_url')
-    audio_url = audio_u.read().decode('utf-8')
-    urllib.request.urlretrieve(audio_url, audio_file_name)
+    audio_url = request.get_json()
+    audio_field = audio_url.get('audio_url')
+    urllib.request.urlretrieve(audio_field, audio_file_name)
     extract_timelines_to_file(audio_file_name, "timelines.json")
     return send_file("timelines.json")
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
