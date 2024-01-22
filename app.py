@@ -51,7 +51,9 @@ def capitalize_and_save_text_bysentences(text: str, file_name: str):
 
 def extract_timelines_to_file(audio_file_name, file_name):
     audio = whisper.load_audio(audio_file_name)
-    model = whisper.load_model("tiny", device='cpu', download_root='.')
+    if not os.path.exists("tiny.pt"):
+        raise FileNotFoundError("No model file found")
+    model = whisper.load_model("tiny.pt", device='cpu')
     result = whisper.transcribe(model, audio, language='en')
     with open(file_name, 'w') as file:
         json.dump(result, file, indent=2, ensure_ascii=False)
