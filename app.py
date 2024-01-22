@@ -1,6 +1,4 @@
 from flask import Flask, request, send_file
-from aeneas.executetask import ExecuteTask
-from aeneas.task import Task
 import json
 import os
 import whisper_timestamped as whisper
@@ -80,4 +78,4 @@ def align_without_text_endpoint():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
