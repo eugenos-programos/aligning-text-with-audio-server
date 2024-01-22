@@ -53,7 +53,7 @@ def capitalize_and_save_text_bysentences(text: str, file_name: str):
 
 def extract_timelines_to_file(audio_file_name, file_name):
     audio = whisper.load_audio(audio_file_name)
-    model = whisper.load_model("tiny", device='cpu')
+    model = whisper.load_model("tiny", device='cpu', download_root='.')
     result = whisper.transcribe(model, audio, language='en')
     with open(file_name, 'w') as file:
         json.dump(result, file, indent=2, ensure_ascii=False)
@@ -73,8 +73,7 @@ def align_endpoint():
 @app.route('/align_without_text', methods=['POST'])
 def align_without_text_endpoint():
     audio_file_name = "audio.mp3"
-    audio_u = request.files.get('audio_url')
-    audio_url = audio_u.read().decode('utf-8')
+    audio_url = request.get_json().get('audio_url')
     urllib.request.urlretrieve(audio_url, audio_file_name)
     extract_timelines_to_file(audio_file_name, "timelines.json")
     return send_file("timelines.json")
